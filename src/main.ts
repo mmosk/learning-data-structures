@@ -1,42 +1,15 @@
+import { tree1 } from "./data";
+
 import "./style.css";
+import Tree from "./tree";
 
-type Node = { value: number; children?: Node[] };
-type Callback = (node: Node) => void;
+const canvas = document.getElementById("canvas") as HTMLCanvasElement;
+const ctx = canvas.getContext("2d");
 
-const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms));
+if (!ctx) throw "No rendering context";
 
-class Tree {
-  currentNode: Node;
+const tree = new Tree(tree1, ctx);
 
-  constructor(public root: Node) {
-    this.currentNode = root;
-  }
-
-  async _traverse(ms: number, cb: Callback, node: Node) {
-    cb(node);
-
-    if (!node.children) return;
-
-    for (const childNode of node.children) {
-      await sleep(ms);
-
-      await this._traverse(ms, cb, childNode);
-    }
-  }
-
-  traverse(ms: number, cb: Callback) {
-    this._traverse(ms, cb, this.currentNode);
-  }
-}
-
-const tree = new Tree({
-  value: 1,
-  children: [
-    { value: 2, children: [{ value: 3 }, { value: 4 }] },
-    { value: 5 },
-  ],
-});
-
-tree.traverse(1500, (node) => {
-  console.log(node.value);
+tree.traverse(750, (node, info) => {
+  console.log(`${info.depth}: ${node.value}`);
 });
